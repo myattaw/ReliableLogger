@@ -1,3 +1,8 @@
+.idea/
+
+# Only commit typescript files
+server/*.js
+
 ### Vue template
 # gitignore template for Vue.js projects
 #
