@@ -1,16 +1,37 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <div id="app">
+    <img alt="Vue logo" src="./assets/logo.png">
+    <div v-if="showLogin">
+      <LoginForm @switchToRegister="toggleForm"/>
+    </div>
+    <div v-else>
+      <RegisterForm @switchToLogin="toggleForm"/>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import {defineComponent, ref} from 'vue';
+import LoginForm from './components/LoginForm.vue';
+import RegisterForm from './components/RegisterForm.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
-    HelloWorld
+    LoginForm,
+    RegisterForm
+  },
+  setup() {
+    const showLogin = ref(true);
+
+    const toggleForm = () => {
+      showLogin.value = !showLogin.value;
+    };
+
+    return {
+      showLogin,
+      toggleForm
+    };
   }
 });
 </script>
@@ -22,6 +43,6 @@ export default defineComponent({
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 20px;
 }
 </style>
