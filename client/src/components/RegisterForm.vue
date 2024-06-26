@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from 'vue';
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'RegisterForm',
@@ -75,9 +75,33 @@ export default defineComponent({
     const password = ref('');
     const confirmPassword = ref('');
 
-    const register = () => {
-      // Perform register logic here
-      console.log(`username: ${username.value}, Email: ${email.value}, Password: ${password.value}, Confirm Password: ${confirmPassword.value}`);
+    const register = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: username.value,
+            email: email.value,
+            password: password.value,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.msg || 'Failed to register');
+        }
+
+        const responseData = await response.json();
+        console.log('Registration successful:', responseData);
+
+        // Optionally, you can redirect the user or perform other actions upon successful registration
+      } catch (error: any) {
+        console.error('Registration error:', error.message);
+        // Handle error display or logging as needed
+      }
     };
 
     return {
@@ -85,9 +109,9 @@ export default defineComponent({
       email,
       password,
       confirmPassword,
-      register
+      register,
     };
-  }
+  },
 });
 </script>
 
@@ -115,5 +139,4 @@ export default defineComponent({
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version */
 }
-
 </style>

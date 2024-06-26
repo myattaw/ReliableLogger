@@ -53,9 +53,30 @@ export default defineComponent({
     const email = ref('');
     const password = ref('');
 
-    const login = () => {
-      // Perform login logic here
-      console.log(`Email: ${email.value}, Password: ${password.value}`);
+    const login = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email.value,
+            password: password.value,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.msg || 'Failed to login');
+        }
+
+        const responseData = await response.json();
+        console.log('Login successful:', responseData);
+
+      } catch (error: any) {
+        console.error('Login error:', error.message);
+      }
     };
 
     return {
