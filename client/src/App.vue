@@ -1,38 +1,14 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <div v-if="showLogin">
-      <LoginForm @switchToRegister="toggleForm"/>
-    </div>
-    <div v-else>
-      <RegisterForm @switchToLogin="toggleForm"/>
-    </div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from 'vue';
-import LoginForm from './components/LoginForm.vue';
-import RegisterForm from './components/RegisterForm.vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'App',
-  components: {
-    LoginForm,
-    RegisterForm
-  },
-  setup() {
-    const showLogin = ref(true);
-
-    const toggleForm = () => {
-      showLogin.value = !showLogin.value;
-    };
-
-    return {
-      showLogin,
-      toggleForm
-    };
-  }
+  name: 'App'
 });
 </script>
 
