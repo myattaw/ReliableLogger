@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-4" v-if="user">
     <div class="card">
-      <div class="card-header">
+      <div class="card-header ">
         <h3 class="header-text">Dashboard</h3>
       </div>
       <div class="card-body">
@@ -66,8 +66,20 @@ export default defineComponent({
 
 <style scoped>
 .header-text {
-  font-size: 1.5em;
-  color: #333;
+  font-size: 2em;
+  color: #444444;
+  text-align: center;
   text-transform: uppercase;
+  letter-spacing: 0.25em;
+  text-shadow:
+      -1px -1px 0 #aaaaaa,
+      1px -1px 0 #aaaaaa,
+      -1px 1px 0 #aaaaaa,
+      1px 1px 0 #aaaaaa;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
+
 </style>

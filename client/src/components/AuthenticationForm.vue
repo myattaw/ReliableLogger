@@ -167,7 +167,7 @@ export default defineComponent({
 
 .header-text {
   font-size: 2em;
-  color: #fbfbfb;
+  color: #444444;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.25em;
