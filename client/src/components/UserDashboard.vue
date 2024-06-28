@@ -13,6 +13,13 @@
           <div class="col-md-6">
             <button @click="logout" class="btn btn-danger float-end">Logout</button>
           </div>
+
+          <div>
+            <h2>Upload File</h2>
+            <input type="file" @change="onFileChange"/>
+            <button @click="uploadFile">Upload</button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -23,8 +30,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import {defineComponent, onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import axios from 'axios';
+import {getFileChecksum} from "@/utils/checksums";
 
 interface User {
   username: string;
@@ -36,6 +45,48 @@ export default defineComponent({
   setup() {
     const user = ref<User | null>(null);
     const router = useRouter();
+    const file = ref<File | null>(null);
+    const checksum = ref<string>('');
+
+    const onFileChange = (event: Event) => {
+      const input = event.target as HTMLInputElement;
+      if (input.files) {
+        file.value = input.files[0];
+      }
+    };
+
+    const uploadFile = async () => {
+      try {
+        if (!file.value) {
+          throw new Error('No file selected.');
+        }
+
+        checksum.value = await getFileChecksum(file.value);
+        console.log('Calculated checksum:', checksum.value);
+
+        // Check if the checksum is unique
+        const checkResponse = await axios.post('/check-checksum', {checksum: checksum.value});
+        if (checkResponse.data.exists) {
+          console.error('File already uploaded by another user.');
+          return;
+        }
+
+        // If the checksum is unique, upload the file
+        const formData = new FormData();
+        formData.append('file', file.value);
+        formData.append('checksum', checksum.value);
+
+        const uploadResponse = await axios.post('/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        console.log('File uploaded successfully', uploadResponse.data);
+      } catch (error) {
+        console.error('Error uploading file', error);
+      }
+    };
 
     onMounted(() => {
       const storedUser = localStorage.getItem('user');
@@ -44,21 +95,25 @@ export default defineComponent({
           const userData = JSON.parse(storedUser) as { token: string; user: User };
           user.value = userData.user;
         } catch (e) {
-          router.push({ name: 'auth' });
+          router.push({name: 'auth'});
         }
       } else {
-        router.push({ name: 'auth' });
+        router.push({name: 'auth'});
       }
     });
 
     const logout = () => {
       localStorage.removeItem('user');
-      router.push({ name: 'auth' });
+      router.push({name: 'auth'});
     };
 
     return {
       user,
-      logout
+      logout,
+      file,
+      checksum,
+      onFileChange,
+      uploadFile
     };
   }
 });
@@ -71,11 +126,10 @@ export default defineComponent({
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  text-shadow:
-      -1px -1px 0 #aaaaaa,
-      1px -1px 0 #aaaaaa,
-      -1px 1px 0 #aaaaaa,
-      1px 1px 0 #aaaaaa;
+  text-shadow: -1px -1px 0 #aaaaaa,
+  1px -1px 0 #aaaaaa,
+  -1px 1px 0 #aaaaaa,
+  1px 1px 0 #aaaaaa;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
