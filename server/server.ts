@@ -4,6 +4,8 @@ import cors from 'cors';
 import {config} from 'dotenv';
 import authRouter from './routes/auth'; // Adjust path based on your project structure
 import dashboardRouter from './routes/dashboard'; // Import your dashboard route
+import reportRouter from './routes/report'; // Import your dashboard route
+
 
 config(); // Load environment variables from .env file
 
@@ -35,6 +37,7 @@ mongoose.connect(MONGO_URI, {
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api', dashboardRouter);
+app.use('/api/report', reportRouter);
 
 const serverPort = PORT ? parseInt(PORT, 10) : 5000;
 app.listen(serverPort, () => console.log(`Server running on port ${serverPort}`));

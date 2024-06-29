@@ -17,7 +17,7 @@
           <div>
             <h2>Upload File</h2>
             <input type="file" @change="onFileChange"/>
-            <button @click="uploadFile">Upload</button>
+            <button class="btn btn-outline-primary float-end" @click="registerPlugin">Register Plugin</button>
           </div>
 
         </div>
@@ -32,7 +32,6 @@
 <script lang="ts">
 import {defineComponent, onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import axios from 'axios';
 import {getFileChecksum} from "@/utils/checksums";
 
 interface User {
@@ -55,34 +54,37 @@ export default defineComponent({
       }
     };
 
-    const uploadFile = async () => {
+    const registerPlugin = async () => {
       try {
         if (!file.value) {
           throw new Error('No file selected.');
         }
 
+        //TODO only allow for .jar files
         checksum.value = await getFileChecksum(file.value);
         console.log('Calculated checksum:', checksum.value);
+        console.log('User:', user.value)
 
-        // Check if the checksum is unique
-        const checkResponse = await axios.post('/check-checksum', {checksum: checksum.value});
-        if (checkResponse.data.exists) {
-          console.error('File already uploaded by another user.');
-          return;
-        }
+        // Send data to backend
+        const data = {
+          email: user.value?.email,
+          plugin: checksum.value
+        };
 
-        // If the checksum is unique, upload the file
-        const formData = new FormData();
-        formData.append('file', file.value);
-        formData.append('checksum', checksum.value);
-
-        const uploadResponse = await axios.post('/upload', formData, {
+        const response = await fetch('http://localhost:5000/api/report/create', {
+          method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/json',
           },
+          body: JSON.stringify({
+            email: user.value?.email,
+            plugin: checksum.value
+          }),
         });
 
-        console.log('File uploaded successfully', uploadResponse.data);
+        const responseData = await response.json();
+        console.log('Report successful:', responseData);
+
       } catch (error) {
         console.error('Error uploading file', error);
       }
@@ -113,7 +115,7 @@ export default defineComponent({
       file,
       checksum,
       onFileChange,
-      uploadFile
+      registerPlugin
     };
   }
 });
