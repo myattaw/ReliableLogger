@@ -12,11 +12,9 @@
         </div>
       </div>
       <div class="card-body">
-
         <div class="alert alert-dismissible alert-success">
           You are currently tracking a total of <strong>{{ plugins.length }}</strong> plugins.
         </div>
-
         <div class="row">
           <div class="col-md-12 text-start">
             <h2>Welcome, {{ user.username }}</h2>
@@ -39,8 +37,14 @@
           <h3 class="header-text">{{ plugin.name }}</h3>
         </div>
         <div class="card-body">
-          <div v-for="error in pluginErrors[plugin.plugin]" :key="error._id">
-            <p class="text-start">{{ error.message }}</p>
+          <div v-if="pluginErrors[plugin.plugin]">
+            <div v-for="error in pluginErrors[plugin.plugin]" :key="error._id" class="error-message">
+              <div class="text-start font-monospace" v-if="!error.collapsed">{{ error.message }}</div>
+              <button class="btn btn-link btn-sm font-monospace" @click="error.collapsed = !error.collapsed">
+                {{ error.collapsed ? 'Show Error from ' + formatDate(error.date) : 'Minimize Error' }}
+              </button>
+
+            </div>
           </div>
         </div>
       </div>
@@ -72,6 +76,8 @@ interface PluginError {
   _id: string;
   plugin: string;
   message: string;
+  date: string;
+  collapsed: boolean;
 }
 
 export default defineComponent({
@@ -83,6 +89,12 @@ export default defineComponent({
     const checksum = ref<string>('');
     const plugins = ref<Plugin[]>([]);
     const pluginErrors = ref<{ [key: string]: PluginError[] }>({});
+
+    const formatDate = (dateString: string): string => {
+      const date = new Date(dateString);
+       // Adjust locale as needed
+      return date.toLocaleString();
+    };
 
     const onFileChange = (event: Event) => {
       const input = event.target as HTMLInputElement;
@@ -97,10 +109,10 @@ export default defineComponent({
           throw new Error('No file selected.');
         }
 
-        // TODO only allow for .jar files
+        // TODO: Validate file type (e.g., .jar)
+
         checksum.value = await getFileChecksum(file.value);
         console.log('Calculated checksum:', checksum.value);
-        console.log('User:', user.value);
 
         const response = await fetch('http://localhost:5000/api/report/create', {
           method: 'POST',
@@ -178,6 +190,7 @@ export default defineComponent({
           if (!acc[error.plugin]) {
             acc[error.plugin] = [];
           }
+          error.collapsed = true; // Initialize collapsed state
           acc[error.plugin].push(error);
           return acc;
         }, {});
@@ -216,6 +229,7 @@ export default defineComponent({
       registerPlugin,
       plugins,
       pluginErrors,
+      formatDate
     };
   }
 });
@@ -236,5 +250,20 @@ export default defineComponent({
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.error-message {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.error-message p {
+  margin: 0;
+}
+
+.error-message button {
+  margin-top: 5px;
 }
 </style>
