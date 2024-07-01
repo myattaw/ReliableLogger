@@ -2,23 +2,33 @@
   <div class="container mt-4" v-if="user">
     <div class="card mb-3">
       <div class="card-header">
-        <h3 class="header-text">Dashboard</h3>
+        <div class="row">
+          <div class="col-md-10 text-start">
+            <h3 class="header-text">Dashboard</h3>
+          </div>
+          <div class="col-md-2 float-end">
+            <button @click="logout" class="btn btn-outline-danger col-12">Logout</button>
+          </div>
+        </div>
       </div>
       <div class="card-body">
+
+        <div class="alert alert-dismissible alert-success">
+          You are currently tracking a total of <strong>{{ plugins.length }}</strong> plugins.
+        </div>
+
         <div class="row">
-          <div class="col-md-6">
-            <h4>Welcome, {{ user.username }}</h4>
+          <div class="col-md-12 text-start">
+            <h2>Welcome, {{ user.username }}</h2>
             <p>Email: {{ user.email }}</p>
           </div>
-          <div class="col-md-6">
-            <button @click="logout" class="btn btn-outline-danger float-end">Logout</button>
-          </div>
-          <h2>Upload File</h2>
+        </div>
+        <div class="row">
           <div class="col-md-9">
             <input type="file" class="form-control" @change="onFileChange"/>
           </div>
           <div class="col-md-3">
-            <button class="btn btn-outline-primary float-end" @click="registerPlugin">Register Plugin</button>
+            <button class="btn btn-outline-success col-12" @click="registerPlugin">Register Plugin</button>
           </div>
         </div>
       </div>
@@ -215,7 +225,7 @@ export default defineComponent({
 .header-text {
   font-size: 2em;
   color: #444444;
-  text-align: center;
+  text-align: left;
   text-transform: uppercase;
   letter-spacing: 0.25em;
   text-shadow: -1px -1px 0 #aaaaaa,
