@@ -65,12 +65,6 @@ export default defineComponent({
         console.log('Calculated checksum:', checksum.value);
         console.log('User:', user.value)
 
-        // Send data to backend
-        const data = {
-          email: user.value?.email,
-          plugin: checksum.value
-        };
-
         const response = await fetch('http://localhost:5000/api/report/create', {
           method: 'POST',
           headers: {
@@ -78,6 +72,7 @@ export default defineComponent({
           },
           body: JSON.stringify({
             email: user.value?.email,
+            name: file.value?.name,
             plugin: checksum.value
           }),
         });
