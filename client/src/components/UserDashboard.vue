@@ -38,12 +38,41 @@
         </div>
         <div class="card-body">
           <div v-if="pluginErrors[plugin.plugin]">
-            <div v-for="error in pluginErrors[plugin.plugin]" :key="error._id" class="error-message">
-              <div class="text-start font-monospace" v-if="!error.collapsed">{{ error.message }}</div>
-              <button class="btn btn-link btn-sm font-monospace" @click="error.collapsed = !error.collapsed">
-                {{ error.collapsed ? 'Show Error from ' + formatDate(error.date) : 'Minimize Error' }}
-              </button>
+            <div id="accordion" class="accordion">
+              <div v-for="(error, index) in pluginErrors[plugin.plugin]" :key="error._id" class="accordion-item spaced-accordion-item">
 
+                <div class="row">
+                  <div class="col-md-10">
+                    <h2 class="accordion-header" :id="'heading' + index">
+                      <button
+                          class="accordion-button font-monospace"
+                          type="button"
+                          :class="{ collapsed: error.collapsed }"
+                          data-bs-toggle="collapse"
+                          :data-bs-target="'#collapse' + index"
+                          aria-expanded="false"
+                          :aria-controls="'collapse' + index"
+                          @click="error.collapsed = !error.collapsed"
+                      >{{ error.collapsed ? 'Show Error from ' + formatDate(error.date) : 'Minimize Error' }}</button>
+                    </h2>
+                  </div>
+                  <div class="col-md-2">
+                    <button class="btn btn-outline-danger full-height-btn col-12">Delete</button>
+                  </div>
+                </div>
+
+                <div
+                    :id="'collapse' + index"
+                    class="accordion-collapse collapse"
+                    :class="{ show: !error.collapsed }"
+                    :aria-labelledby="'heading' + index"
+                    data-bs-parent="#accordion"
+                >
+                  <div class="accordion-body text-start font-monospace">
+                    {{ error.message }}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -266,4 +295,16 @@ export default defineComponent({
 .error-message button {
   margin-top: 5px;
 }
+
+.spaced-accordion-item {
+  margin-bottom: 1rem; /* Add space between accordion items */
+  border-color: transparent;
+}
+
+.full-height-btn {
+  height: 100%; /* Button covers the full height of the parent */
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+}
+
 </style>
